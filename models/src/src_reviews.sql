@@ -4,4 +4,4 @@ select
     a.reviewer_name,
     a.comments review_text,
     a.sentiment review_sentiment
-from from {{ source( 'airbnb', 'reviews' )}} a
+from {{ source( 'airbnb', 'reviews' )}} a

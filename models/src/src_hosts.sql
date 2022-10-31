@@ -1,5 +1,5 @@
 with hosts_data as (
-    select * from from {{ source( 'airbnb', 'hosts' )}}
+    select * from {{ source( 'airbnb', 'hosts' )}}
 )
 select 
    a.id host_id,
