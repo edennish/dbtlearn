@@ -2,14 +2,16 @@ version: 2
 
 models:
   - name: dim_listings_cleansed
+    description: Cleansed table which contains Airbnb listings.
     columns:
-
     - name: listing_id
+      description: Primary key for the listing.
       tests:
         - unique
         - not_null
 
     - name: host_id
+      descriptions: Host's id. References to host table
       tests:
         - not_null
         - relationships:
@@ -17,6 +19,7 @@ models:
             field: host_id
 
     - name: room_type
+      description: Type of room
       tests:
         - accepted_values:
             values: ['Entire home/apt', 'Private room', 'Shared room', 'Hotel room']
@@ -25,3 +28,37 @@ models:
       test:
         - positive_value
 
+  - name: dim_hosts_cleansed
+    description: Cleansed table which contains Airbnb Hosts.
+    columns:
+    - name: host_id
+      description: Primary key for the host.
+    
+    - name: host_name
+      description: Host's name
+    
+    - name: is_superhost
+      description: Is the host a super host?
+    
+    - name: created_at
+      description: Date of creation
+    
+    - name: updated_at
+      description: Date of update
+  - name: dim_listings_w_hosts
+    tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: source('airbnb','listings')
+    columns:
+      - name: price
+        tests: 
+          - dbt_expectations.expect_column_quantile_values_to_be_between:
+              quantile: .99
+              min_value: 50
+              max_value: 500
+          - dbt_expectations.expect_column_max_to_be_between:
+              max_value: 5000
+              config:
+                severity: warn
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: number
